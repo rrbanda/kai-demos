@@ -2,7 +2,7 @@ schemaVersion: 2.2.0
 metadata:
   name: kai-devspaces
 attributes:
-  controller.devfile.io/storage-type: per-workspace
+  controller.devfile.io/storage-type: per-user
 components:
   - name: kai-tools
     container:
@@ -10,6 +10,8 @@ components:
       memoryLimit: 4Gi
       mountSources: true
       sourceMapping: /projects
-      env:
-        - name: XDG_DATA_HOME
-          value: /home/devuser/.local
+      endpoints:
+        - name: code-server
+          targetPort: 8080
+          type: web
+          exposure: public
