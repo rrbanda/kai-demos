@@ -14,14 +14,12 @@ components:
       cpuRequest: "1"
       mountSources: true
       sourceMapping: /projects
+      env:
+        - name: HOME
+          value: /home/user
       volumeMounts:
         - name: config
           path: /home/user/.config
-      endpoints:
-        - name: kai-code-server
-          targetPort: 8080
-          exposure: public
-          protocol: http
       command:
         - code-server
       args:
@@ -31,6 +29,11 @@ components:
         - none
         - --user-data-dir
         - /home/user/.config
+      endpoints:
+        - name: kai-code-server
+          targetPort: 8080
+          exposure: public
+          protocol: http
 
   - name: config
     volume:
