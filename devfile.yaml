@@ -4,16 +4,28 @@ metadata:
 attributes:
   controller.devfile.io/storage-type: per-workspace
 components:
-  - name: kai-runtime
+  - name: kai-dev-container
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
-      memoryLimit: "4Gi"
-      cpuLimit: "2000m"
+      memoryLimit: 4Gi
+      cpuLimit: "2"
       mountSources: true
       sourceMapping: /projects
-      volumeMounts:
-        - name: projects
-          path: /projects
-  - name: projects
-    volume:
-      size: 10Gi
+      env:
+        - name: XDG_DATA_HOME
+          value: /home/devuser/.local
+      endpoints:
+        - name: code-server
+          targetPort: 8080
+          exposure: public
+          protocol: http
+commands:
+  - id: start-code-server
+    exec:
+      label: "Start code-server"
+      component: kai-dev-container
+      commandLine: "code-server --auth none --bind-addr 0.0.0.0:8080 /projects"
+      workingDir: /projects
+      group:
+        kind: run
+        isDefault: true
