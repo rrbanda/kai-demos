@@ -4,30 +4,16 @@ metadata:
 attributes:
   controller.devfile.io/storage-type: per-workspace
 components:
-  - name: kai-container
+  - name: kai-runtime
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
       memoryLimit: "4Gi"
-      cpuLimit: "2"
+      cpuLimit: "2000m"
       mountSources: true
       sourceMapping: /projects
-      command:
-        - /bin/sh
-      args:
-        - -c
-        - |
-          export XDG_DATA_HOME=/home/devuser/.local && \
-          mkdir -p "$XDG_DATA_HOME" && \
-          code-server --auth none --bind-addr 0.0.0.0:8080 /projects
-      env:
-        - name: XDG_DATA_HOME
-          value: /home/devuser/.local
-        - name: SHELL
-          value: /bin/bash
       volumeMounts:
-        - name: home
-          path: /home/devuser
-
-  - name: home
+        - name: projects
+          path: /projects
+  - name: projects
     volume:
-      size: 2Gi
+      size: 10Gi
