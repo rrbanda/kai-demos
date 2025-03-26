@@ -2,43 +2,35 @@ schemaVersion: 2.2.0
 metadata:
   name: kai-devspaces
   version: 1.0.0
+  displayName: Kai DevSpaces with code-server
+  description: Custom image with Kai dependencies, code-server, and Konveyor plugin
+  tags:
+    - vscode
+    - konveyor
+    - kai
+    - devspaces
 attributes:
   controller.devfile.io/storage-type: per-workspace
+
 components:
-  - name: kai-tools
+  - name: kai-dev-tools
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
       memoryLimit: 4Gi
-      memoryRequest: 2Gi
-      cpuLimit: "2"
-      cpuRequest: "1"
       mountSources: true
       sourceMapping: /projects
+      command: ["code-server"]
       env:
-        - name: PYTHON_VERSION
-          value: "3.12"
-        - name: GLIBC_VERSION
-          value: "2.38"
-      volumeMounts:
-        - name: vscodedata
-          path: /home/user/.vscode
-  - name: vscodedata
-    volume:
-      size: 1Gi
-
-projects:
-  - name: python-hello-world
-    git:
-      remotes:
-        origin: https://github.com/konveyor-ecosystem/python-hello-world.git
+        - name: PASSWORD
+          value: devspaces  # Optional: password for code-server
 
 commands:
-  - id: run-python
+  - id: open-code-server
     exec:
-      label: "Run Python App"
-      component: kai-tools
-      commandLine: "python3.12 app.py"
-      workingDir: ${PROJECTS_ROOT}/python-hello-world
+      label: "Start code-server"
+      component: kai-dev-tools
+      commandLine: "code-server --host 0.0.0.0 --port 8080"
+      workingDir: /projects
       group:
         kind: run
         isDefault: true
