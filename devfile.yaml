@@ -7,8 +7,8 @@ components:
   - name: kai-container
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
-      memoryLimit: 4Gi
-      cpuLimit: 2
+      memoryLimit: "4Gi"
+      cpuLimit: "2"
       mountSources: true
       sourceMapping: /projects
       command:
@@ -27,7 +27,7 @@ components:
       volumeMounts:
         - name: home
           path: /home/devuser
+
   - name: home
     volume:
       size: 2Gi
-
