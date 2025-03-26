@@ -1,8 +1,11 @@
 schemaVersion: 2.2.0
 metadata:
   name: kai-devspaces
+  version: 1.0.0
+attributes:
+  controller.devfile.io/storage-type: per-workspace
 components:
-  - name: tools
+  - name: kai-tools
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
       memoryLimit: 4Gi
@@ -14,14 +17,28 @@ components:
       env:
         - name: PYTHON_VERSION
           value: "3.12"
+        - name: GLIBC_VERSION
+          value: "2.38"
+      volumeMounts:
+        - name: vscodedata
+          path: /home/user/.vscode
+  - name: vscodedata
+    volume:
+      size: 1Gi
+
+projects:
+  - name: python-hello-world
+    git:
+      remotes:
+        origin: https://github.com/konveyor-ecosystem/python-hello-world.git
+
 commands:
-  - id: setup
+  - id: run-python
     exec:
-      label: "Check Python and GLIBC version"
-      component: tools
-      commandLine: |
-        python --version
-        ldd --version
-      workingDir: /projects
+      label: "Run Python App"
+      component: kai-tools
+      commandLine: "python3.12 app.py"
+      workingDir: ${PROJECTS_ROOT}/python-hello-world
       group:
-        kind: build
+        kind: run
+        isDefault: true
