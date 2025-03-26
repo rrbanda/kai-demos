@@ -3,38 +3,13 @@ metadata:
   name: kai-devspaces
 attributes:
   controller.devfile.io/storage-type: per-workspace
-
 components:
-  - name: kai-container
+  - name: kai-tools
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
       memoryLimit: 4Gi
-      memoryRequest: 2Gi
-      cpuLimit: "2"
-      cpuRequest: "1"
       mountSources: true
       sourceMapping: /projects
       env:
-        - name: HOME
-          value: /home/user
-      volumeMounts:
-        - name: config
-          path: /home/user/.config
-      command:
-        - code-server
-      args:
-        - --bind-addr
-        - 0.0.0.0:8080
-        - --auth
-        - none
-        - --user-data-dir
-        - /home/user/.config
-      endpoints:
-        - name: kai-code-server
-          targetPort: 8080
-          exposure: public
-          protocol: http
-
-  - name: config
-    volume:
-      size: 1Gi
+        - name: XDG_DATA_HOME
+          value: /home/devuser/.local
