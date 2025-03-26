@@ -1,0 +1,27 @@
+schemaVersion: 2.2.0
+metadata:
+  name: kai-devspaces
+components:
+  - name: tools
+    container:
+      image: quay.io/rbrhssa/kai-devspaces:latest
+      memoryLimit: 4Gi
+      memoryRequest: 2Gi
+      cpuLimit: "2"
+      cpuRequest: "1"
+      mountSources: true
+      sourceMapping: /projects
+      env:
+        - name: PYTHON_VERSION
+          value: "3.12"
+commands:
+  - id: setup
+    exec:
+      label: "Check Python and GLIBC version"
+      component: tools
+      commandLine: |
+        python --version
+        ldd --version
+      workingDir: /projects
+      group:
+        kind: build
