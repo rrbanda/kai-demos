@@ -1,48 +1,29 @@
 schemaVersion: 2.2.0
 metadata:
   name: kai-devspaces
-  displayName: Kai DevSpaces
-  description: Dev environment with code-server and Kai dependencies
-  tags:
-    - vscode
-    - code-server
-    - konveyor
-    - kai
 attributes:
   controller.devfile.io/storage-type: per-workspace
 
 components:
-  - name: kai-dev
+  - name: kai-container
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
       memoryLimit: 4Gi
+      memoryRequest: 2Gi
       cpuLimit: "2"
+      cpuRequest: "1"
       mountSources: true
       sourceMapping: /projects
-      env:
-        - name: SHELL
-          value: "/bin/zsh"
-      volumeMounts:
-        - name: kai-cache
-          path: /home/user/.cache
+      endpoints:
+        - name: kai-code-server
+          targetPort: 8080
+          exposure: public
+          protocol: http
+      command:
+        - code-server
+      args:
+        - --bind-addr
+        - 0.0.0.0:8080
+        - --auth
+        - none
 
-  - name: kai-cache
-    volume:
-      size: 2Gi
-
-commands:
-  - id: open-code-server
-    exec:
-      label: "Start VS Code Server"
-      component: kai-dev
-      commandLine: "code-server --bind-addr 0.0.0.0:8080 --auth none"
-      workingDir: /projects
-      group:
-        kind: run
-        isDefault: true
-
-endpoints:
-  - name: code-server
-    targetPort: 8080
-    exposure: public
-    protocol: https
