@@ -14,6 +14,9 @@ components:
       cpuRequest: "1"
       mountSources: true
       sourceMapping: /projects
+      volumeMounts:
+        - name: config
+          path: /home/user/.config
       endpoints:
         - name: kai-code-server
           targetPort: 8080
@@ -26,4 +29,9 @@ components:
         - 0.0.0.0:8080
         - --auth
         - none
+        - --user-data-dir
+        - /home/user/.config
 
+  - name: config
+    volume:
+      size: 1Gi
