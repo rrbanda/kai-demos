@@ -1,16 +1,8 @@
 schemaVersion: 2.2.0
 metadata:
   name: kai-devspaces
-attributes:
-  controller.devfile.io/storage-type: per-workspace
-
 components:
   - name: kai-dev-container
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
       memoryLimit: 4Gi
-      mountSources: true
-      sourceMapping: /projects
-      env:
-        - name: HOME
-          value: /home/devuser
