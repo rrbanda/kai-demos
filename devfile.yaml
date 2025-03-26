@@ -2,16 +2,32 @@ schemaVersion: 2.2.0
 metadata:
   name: kai-devspaces
 attributes:
-  controller.devfile.io/storage-type: per-user
+  controller.devfile.io/storage-type: per-workspace
 components:
-  - name: kai-tools
+  - name: kai-container
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
       memoryLimit: 4Gi
+      cpuLimit: 2
       mountSources: true
       sourceMapping: /projects
-      endpoints:
-        - name: code-server
-          targetPort: 8080
-          type: web
-          exposure: public
+      command:
+        - /bin/sh
+      args:
+        - -c
+        - |
+          export XDG_DATA_HOME=/home/devuser/.local && \
+          mkdir -p "$XDG_DATA_HOME" && \
+          code-server --auth none --bind-addr 0.0.0.0:8080 /projects
+      env:
+        - name: XDG_DATA_HOME
+          value: /home/devuser/.local
+        - name: SHELL
+          value: /bin/bash
+      volumeMounts:
+        - name: home
+          path: /home/devuser
+  - name: home
+    volume:
+      size: 2Gi
+
