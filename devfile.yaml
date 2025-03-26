@@ -2,19 +2,47 @@ schemaVersion: 2.2.0
 metadata:
   name: kai-devspaces
   displayName: Kai DevSpaces
-  description: Dev environment for running Konveyor AI in OpenShift Dev Spaces
+  description: Dev environment with code-server and Kai dependencies
+  tags:
+    - vscode
+    - code-server
+    - konveyor
+    - kai
+attributes:
+  controller.devfile.io/storage-type: per-workspace
+
 components:
-  - name: kai-container
+  - name: kai-dev
     container:
       image: quay.io/rbrhssa/kai-devspaces:latest
       memoryLimit: 4Gi
+      cpuLimit: "2"
       mountSources: true
       sourceMapping: /projects
       env:
-        - name: XDG_CONFIG_HOME
-          value: /projects/.config
-      endpoints:
-        - name: code-server
-          targetPort: 8080
-          exposure: public
-          protocol: http
+        - name: SHELL
+          value: "/bin/zsh"
+      volumeMounts:
+        - name: kai-cache
+          path: /home/user/.cache
+
+  - name: kai-cache
+    volume:
+      size: 2Gi
+
+commands:
+  - id: open-code-server
+    exec:
+      label: "Start VS Code Server"
+      component: kai-dev
+      commandLine: "code-server --bind-addr 0.0.0.0:8080 --auth none"
+      workingDir: /projects
+      group:
+        kind: run
+        isDefault: true
+
+endpoints:
+  - name: code-server
+    targetPort: 8080
+    exposure: public
+    protocol: https

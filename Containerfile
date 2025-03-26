@@ -1,7 +1,11 @@
 FROM fedora:39
 
-# Install dependencies (Kai + VS Code CLI support)
-RUN dnf install -y \
+# Disable zchunk metadata to avoid checksum issues
+RUN echo 'zchunk=false' >> /etc/dnf/dnf.conf
+
+# Clean old cache and install dependencies
+RUN dnf clean all && \
+    dnf install -y \
     python3.12 \
     python3.12-devel \
     java-17-openjdk-devel \
@@ -21,18 +25,9 @@ RUN dnf install -y \
 # Install code-server
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Download and install the Konveyor AI extension
-RUN curl -L -o /tmp/konveyor-ai.vsix https://github.com/konveyor/editor-extensions/releases/download/v0.1.0/konveyor-v0.1.0.vsix && \
-    code-server --install-extension /tmp/konveyor-ai.vsix && \
-    rm /tmp/konveyor-ai.vsix
-
-# Expose default code-server port
-EXPOSE 8080
-
-# Ensure proper runtime dir for code-server
-ENV XDG_CONFIG_HOME=/projects/.config
-
-# Set code-server as the default process
-CMD ["code-server", "--bind-addr", "0.0.0.0:8080", "--auth", "none", "/projects"]
+# Optional: Add extension if available
+# RUN wget https://github.com/konveyor/editor-extensions/releases/download/v0.1.0/konveyor-v0.1.0.vsix && \
+#     code-server --install-extension konveyor-v0.1.0.vsix && \
+#     rm konveyor-v0.1.0.vsix
 
 USER 1000
