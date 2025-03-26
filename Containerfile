@@ -1,33 +1,25 @@
-FROM fedora:39
+# Use official Dev Spaces base 
+FROM registry.redhat.io/devspaces/udi-rhel9:3.18-2.1741779985
 
-# Disable zchunk metadata to avoid checksum issues
-RUN echo 'zchunk=false' >> /etc/dnf/dnf.conf
+USER root
 
-# Clean old cache and install dependencies
+# Avoid flaky mirrors, timeouts, or zchunk checksum mismatches
+RUN echo "fastestmirror=True" >> /etc/dnf/dnf.conf && \
+    echo "skip_if_unavailable=True" >> /etc/dnf/dnf.conf && \
+    echo "zchunk=False" >> /etc/dnf/dnf.conf
+
+# Install dependencies required by Konveyor AI + typical tools
 RUN dnf clean all && \
-    dnf install -y \
-    python3.12 \
-    python3.12-devel \
-    java-17-openjdk-devel \
-    nodejs \
-    maven \
-    unzip \
-    git \
-    curl \
-    zsh \
-    gcc \
-    make \
-    glibc-devel \
-    libffi-devel \
-    openssl-devel && \
-    dnf clean all
+    dnf install -y --nobest --allowerasing \
+        python3.12 python3.12-devel \
+        java-17-openjdk-devel \
+        nodejs maven \
+        unzip git curl zsh \
+        gcc make glibc-devel libffi-devel openssl-devel \
+    && dnf clean all
 
-# Install code-server
-RUN curl -fsSL https://code-server.dev/install.sh | sh
+COPY konveyor-v0.0.13.vsix / 
 
-# Optional: Add extension if available
-# RUN wget https://github.com/konveyor/editor-extensions/releases/download/v0.1.0/konveyor-v0.1.0.vsix && \
-#     code-server --install-extension konveyor-v0.1.0.vsix && \
-#     rm konveyor-v0.1.0.vsix
+ENV DEFAULT_EXTENSIONS=/konveyor-v0.0.13.vsix    
 
-USER 1000
+USER user
